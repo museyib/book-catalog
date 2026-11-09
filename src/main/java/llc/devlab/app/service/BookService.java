@@ -53,10 +53,11 @@ public class BookService {
 
     public CursorResponse<BookSummaryResponse> list(int size, String sort, BookCursorFilterRequest request) {
         List<Book> result = bookRepository.findBy(BookCursorSpecifications.fromFilter(request),
-                o -> o.limit(size + 1)
+                spec -> spec
                         .project("authors", "category")
                         .sortBy(SortParser.parse(sort))
-                        .stream().toList());
+                        .stream().toList())
+                .stream().limit(size + 1).toList();
 
         boolean hasNextPage = result.size() > size;
 

@@ -185,13 +185,13 @@ class BookControllerIntegrationTest extends IntegrationTestSupport {
                         .header("Authorization", bearerToken)
                         .param("page", "-1"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.fieldErrors[0].field", equalTo("page")));
+                .andExpect(jsonPath("$.message", equalTo("list.page: page must be zero or greater.")));
 
         mockMvc.perform(get("/api/books")
                         .header("Authorization", bearerToken)
                         .param("size", "101"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", equalTo("Page size must not exceed 100.")));
+                .andExpect(jsonPath("$.message", equalTo("list.size: size must be at most 100.")));
 
         mockMvc.perform(get("/api/books")
                         .header("Authorization", bearerToken)

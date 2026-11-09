@@ -6,7 +6,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
+import llc.devlab.app.exception.ResourceNotFoundException;
 import llc.devlab.app.model.dto.book.*;
 import llc.devlab.app.model.entity.Author;
 import llc.devlab.app.model.entity.Book;
@@ -66,7 +68,15 @@ public abstract class BookMapper {
             return null;
         }
         return labels.stream()
-                .map(labelId -> entityManager.getReference(Author.class, labelId))
+                .map(labelId -> {
+                    Author author = entityManager.getReference(Author.class, labelId);
+                    try {
+                        author.getName();
+                    } catch (EntityNotFoundException e) {
+                        throw new ResourceNotFoundException("Author not found with id: " + labelId);
+                    }
+                    return author;
+                })
                 .collect(Collectors.toSet());
     }
 
@@ -74,6 +84,13 @@ public abstract class BookMapper {
         if (categoryId == null) {
             return null;
         }
-        return entityManager.getReference(Category.class, categoryId);
+        Category category = entityManager.getReference(Category.class, categoryId);
+        try {
+            category.getName();
+        } catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException("Category not found with id: " + categoryId);
+        }
+
+        return category;
     }
 }

@@ -1,6 +1,7 @@
 package llc.devlab.app.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import llc.devlab.app.model.dto.book.*;
 import llc.devlab.app.model.dto.common.CursorResponse;
@@ -23,7 +24,10 @@ public class BookController {
     @GetMapping
     ResponseEntity<PageResponse<BookSummaryResponse>> list(
             @RequestParam(defaultValue = "0") @Min(value = 0, message = "page must be zero or greater.") int page,
-            @RequestParam(defaultValue = "20") @Min(value = 1, message = "size must be at least 1.") int size,
+            @RequestParam(defaultValue = "20")
+            @Min(value = 1, message = "size must be at least 1.")
+            @Max(value = 100, message = "size must be at most 100.")
+            int size,
             @RequestParam(required = false) String sort,
             @Valid @ModelAttribute BookFilterRequest filter
     ) {
@@ -32,7 +36,10 @@ public class BookController {
 
     @GetMapping("/cursor")
     ResponseEntity<CursorResponse<BookSummaryResponse>> listWithCursor(
-            @RequestParam(defaultValue = "20") @Min(value = 1, message = "size must be at least 1.") int size,
+            @RequestParam(defaultValue = "20")
+            @Min(value = 1, message = "size must be at least 1.")
+            @Max(value = 100, message = "size must be at most 100.")
+            int size,
             @RequestParam(required = false) String sort,
             @Valid @ModelAttribute BookCursorFilterRequest filter
     ) {
