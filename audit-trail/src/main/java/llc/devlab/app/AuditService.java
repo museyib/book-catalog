@@ -1,0 +1,28 @@
+package llc.devlab.app;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class AuditService {
+
+    private final AuditRepository auditRepository;
+    private final AuditEventMapper auditEventMapper;
+
+
+    public List<AuditEventDto> getEvents() {
+        return auditRepository.findAll().stream()
+                .map(auditEventMapper::toDto)
+                .toList();
+    }
+
+    @Transactional
+    public void logEvent(AuditEventRequest request) {
+        AuditEvent auditEvent = auditEventMapper.toEntity(request);
+        auditRepository.save(auditEvent);
+    }
+}

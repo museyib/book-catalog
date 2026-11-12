@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import llc.devlab.app.Auditable;
 import llc.devlab.app.config.AppProperties;
 import llc.devlab.app.exception.BadRequestException;
 import llc.devlab.app.exception.ConflictException;
@@ -77,6 +78,11 @@ public class BookService {
     }
 
     @Transactional
+    @Auditable(
+            actor = "USER",
+            action = "CREATE",
+            target = "BOOK"
+    )
     public BookResponse create(BookCreateRequest request) {
         if (bookRepository.existsByIsbnIgnoreCase(request.isbn().trim())) {
             throw new ConflictException("ISBN must be unique.");
@@ -86,6 +92,11 @@ public class BookService {
     }
 
     @Transactional
+    @Auditable(
+            actor = "USER",
+            action = "UPDATE",
+            target = "BOOK"
+    )
     public BookResponse update(Long id, BookUpdateRequest request) {
         if (bookRepository.existsByIsbnIgnoreCaseAndIdNot(request.isbn().trim(), id)) {
             throw new ConflictException("ISBN must be unique.");
@@ -96,6 +107,11 @@ public class BookService {
     }
 
     @Transactional
+    @Auditable(
+            actor = "USER",
+            action = "DELETE",
+            target = "BOOK"
+    )
     public void delete(Long id) {
         bookRepository.delete(loadBook(id));
     }

@@ -39,3 +39,5 @@ app:
     access-token-expiration-seconds: ${JWT_ACCESS_TOKEN_EXPIRATION_SECONDS:900}
     refresh-token-expiration-seconds: ${JWT_REFRESH_TOKEN_EXPIRATION_SECONDS:604800}
     secret: ${JWT_SECRET}
+server:
+  port: ${SERVER_PORT:8090}
