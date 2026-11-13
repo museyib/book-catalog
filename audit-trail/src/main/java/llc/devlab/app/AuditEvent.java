@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.net.InetAddress;
 import java.time.Instant;
 
 @Getter
@@ -16,11 +17,18 @@ public class AuditEvent {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    private Instant logTime;
+    private Instant occurredAt;
 
-    private String actor;
+    private String actorId;
 
-    private String action;
+    @Enumerated(EnumType.STRING)
+    private AuditAction action;
 
-    private String target;
+    private String targetType;
+
+    private String targetId;
+
+    private InetAddress ipAddress;
+
+    private Instant createdAt = Instant.now();
 }

@@ -3,6 +3,8 @@ package llc.devlab.app.service;
 import java.time.Instant;
 import java.util.Locale;
 import java.util.UUID;
+
+import llc.devlab.app.Auditable;
 import llc.devlab.app.exception.BadRequestException;
 import llc.devlab.app.exception.ConflictException;
 import llc.devlab.app.model.dto.auth.AccountResponse;
@@ -23,6 +25,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static llc.devlab.app.AuditAction.*;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -34,6 +38,11 @@ public class AuthService {
     private final JwtService jwtService;
 
     @Transactional
+    @Auditable(
+            action = REGISTER,
+            targetType = "Account",
+            targetId = ""
+    )
     public TokenResponse register(RegisterRequest request) {
         String normalizedEmail = normalizeEmail(request.email());
         if (accountRepository.existsByEmailIgnoreCase(normalizedEmail)) {
@@ -49,6 +58,11 @@ public class AuthService {
     }
 
     @Transactional
+    @Auditable(
+            action = LOGIN,
+            targetType = "Account",
+            targetId = ""
+    )
     public TokenResponse login(LoginRequest request) {
         String normalizedEmail = normalizeEmail(request.email());
         authenticationManager.authenticate(
@@ -81,6 +95,11 @@ public class AuthService {
     }
 
     @Transactional
+    @Auditable(
+            action = LOGOUT,
+            targetType = "Account",
+            targetId = ""
+    )
     public void logout(RefreshTokenRequest request) {
         JwtService.ParsedRefreshToken parsed = parseRefreshToken(request.refreshToken());
         refreshTokenRepository.findById(parsed.tokenId()).ifPresent(token -> {

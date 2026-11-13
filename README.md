@@ -82,6 +82,46 @@ Protected routes:
 - `GET|POST|PUT|DELETE /api/authors`
 - `GET|POST|PUT|DELETE /api/categories`
 
+## Audit Trail
+
+The Audit Trail records selected successful service operations and lets administrators review those events. Its implementation lives in the `audit-trail` module, while the main application supplies the current actor and client IP providers and marks service methods for auditing.
+
+### Event workflow
+
+1. A service method annotated with `@Auditable` completes successfully.
+2. `AuditAspect` runs after the method returns. It builds an event from the current actor, the annotation's action and target type, the client IP, and the configured target ID.
+3. The target ID is a Spring Expression Language (SpEL) expression evaluated against the method parameters and return value. For example, `#id` reads an argument and `#result.id()` reads a returned record's ID. An empty expression leaves the target ID unset.
+4. `AuditService` saves the event to `audit_event`. Flyway creates this table from migration `V2__create_audit_table.sql`.
+5. An administrator can query the saved events through `GET /audit`.
+
+Because the aspect uses `@AfterReturning`, failed operations do not create events. Current annotations cover book and category reads and writes, plus account registration, login, and logout. The action values are `CREATE`, `READ`, `UPDATE`, `DELETE`, `REGISTER`, `LOGIN`, and `LOGOUT`.
+
+### Query audit events
+
+`GET /audit` requires an authenticated user with the `ADMIN` role. All query parameters are optional and combine as AND filters:
+
+| Parameter | Meaning |
+| --- | --- |
+| `actorId` | Exact actor ID, case-insensitive |
+| `action` | Exact action enum value, such as `CREATE` or `LOGIN` |
+| `targetType` | Exact target type, case-insensitive |
+| `targetId` | Exact target ID, case-insensitive |
+| `dateFrom` | Inclusive lower bound for event time, ISO-8601 instant |
+| `dateTo` | Inclusive upper bound for event time, ISO-8601 instant |
+
+Example:
+
+```http
+GET /audit?action=UPDATE&targetType=Book&dateFrom=2026-01-01T00:00:00Z&dateTo=2026-01-31T23:59:59Z
+Authorization: Bearer <admin-access-token>
+```
+
+The response is a JSON array of events with `id`, `occurredAt`, `actorId`, `action`, `targetType`, `targetId`, and `ipAddress`. The endpoint currently returns the full matching result set without pagination.
+
+### Adding audit coverage
+
+Annotate the service method that represents the operation, setting its action and a stable target type. Use a SpEL `targetId` when an ID can be read from the method arguments or successful return value. The actor and IP are resolved automatically by the application's provider implementations. Events are currently emitted only for successful returns, so methods that throw exceptions are not recorded.
+
 ### Book List
 
 `GET /api/books`

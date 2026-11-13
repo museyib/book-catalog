@@ -23,6 +23,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static llc.devlab.app.AuditAction.*;
+
 @Service
 @RequiredArgsConstructor
 public class BookService {
@@ -31,6 +33,11 @@ public class BookService {
     private final BookMapper bookMapper;
     private final AppProperties properties;
 
+    @Auditable(
+            action = READ,
+            targetType = "Books",
+            targetId = ""
+    )
     public PageResponse<BookSummaryResponse> list(int page, int size, String sort, BookFilterRequest request) {
         Pageable pageable = createPageable(page, size, sort);
         Page<Book> rawPage = bookRepository.findAll(BookSpecifications.fromFilter(request), pageable);
@@ -52,6 +59,11 @@ public class BookService {
         return PageResponse.of(content, rawPage);
     }
 
+    @Auditable(
+            action = READ,
+            targetType = "Books",
+            targetId = ""
+    )
     public CursorResponse<BookSummaryResponse> list(int size, String sort, BookCursorFilterRequest request) {
         List<Book> result = bookRepository.findBy(BookCursorSpecifications.fromFilter(request),
                 spec -> spec
@@ -71,6 +83,11 @@ public class BookService {
         return new CursorResponse<>(result.stream().map(bookMapper::toSummary).toList(), nextCursorId, hasNextPage);
     }
 
+    @Auditable(
+            action = READ,
+            targetType = "Book",
+            targetId = "#result.id()"
+    )
     public BookResponse get(Long id) {
         Book book = bookRepository.findDetailedById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book with id %d was not found.".formatted(id)));
@@ -79,12 +96,12 @@ public class BookService {
 
     @Transactional
     @Auditable(
-            actor = "USER",
-            action = "CREATE",
-            target = "BOOK"
+            action = CREATE,
+            targetType = "Book",
+            targetId = "#result.id()"
     )
     public BookResponse create(BookCreateRequest request) {
-        if (bookRepository.existsByIsbnIgnoreCase(request.isbn().trim())) {
+        if (bookRepository.existsByIsbnIgnoreCase(request.isbn())) {
             throw new ConflictException("ISBN must be unique.");
         }
         Book book = bookMapper.toEntity(request);
@@ -93,12 +110,12 @@ public class BookService {
 
     @Transactional
     @Auditable(
-            actor = "USER",
-            action = "UPDATE",
-            target = "BOOK"
+            action = UPDATE,
+            targetType = "Book",
+            targetId = "#result.id()"
     )
     public BookResponse update(Long id, BookUpdateRequest request) {
-        if (bookRepository.existsByIsbnIgnoreCaseAndIdNot(request.isbn().trim(), id)) {
+        if (bookRepository.existsByIsbnIgnoreCaseAndIdNot(request.isbn(), id)) {
             throw new ConflictException("ISBN must be unique.");
         }
         Book book = loadBook(id);
@@ -108,9 +125,9 @@ public class BookService {
 
     @Transactional
     @Auditable(
-            actor = "USER",
-            action = "DELETE",
-            target = "BOOK"
+            action = DELETE,
+            targetType = "BOOK",
+            targetId = "#id"
     )
     public void delete(Long id) {
         bookRepository.delete(loadBook(id));

@@ -1,4 +1,4 @@
 package llc.devlab.app;
 
-public record AuditEventRequest(String actor, String action, String target) {
+public record AuditEventRequest(String actorId, AuditAction action, String targetType, String targetId, String ipAddress) {
 }

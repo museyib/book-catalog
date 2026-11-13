@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Auditable {
-    String actor();
-    String action();
-    String target();
+    AuditAction action();
+    String targetType();
+    String targetId();
 }

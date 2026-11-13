@@ -1,6 +1,8 @@
 package llc.devlab.app.service;
 
 import java.util.List;
+
+import llc.devlab.app.Auditable;
 import llc.devlab.app.exception.ConflictException;
 import llc.devlab.app.exception.ResourceNotFoundException;
 import llc.devlab.app.mapper.CategoryMapper;
@@ -13,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static llc.devlab.app.AuditAction.*;
+
 @Service
 @RequiredArgsConstructor
 public class CategoryService {
@@ -22,6 +26,11 @@ public class CategoryService {
     private final CategoryMapper categoryMapper;
 
     @Transactional(readOnly = true)
+    @Auditable(
+            action = READ,
+            targetType = "Categories",
+            targetId = ""
+    )
     public List<CategoryResponse> list() {
         return categoryRepository.findAllByOrderByNameAsc()
                 .stream()
@@ -30,11 +39,21 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
+    @Auditable(
+            action = READ,
+            targetType = "Category",
+            targetId = "id"
+    )
     public CategoryResponse get(Long id) {
         return categoryMapper.toResponse(loadCategory(id));
     }
 
     @Transactional
+    @Auditable(
+            action = CREATE,
+            targetType = "Category",
+            targetId = "#result.id"
+    )
     public CategoryResponse create(CategoryRequest request) {
         if (categoryRepository.existsByNameIgnoreCase(request.name().trim())) {
             throw new ConflictException("Category name must be unique.");
@@ -46,6 +65,11 @@ public class CategoryService {
     }
 
     @Transactional
+    @Auditable(
+            action = UPDATE,
+            targetType = "Category",
+            targetId = "#result.id"
+    )
     public CategoryResponse update(Long id, CategoryRequest request) {
         if (categoryRepository.existsByNameIgnoreCaseAndIdNot(request.name().trim(), id)) {
             throw new ConflictException("Category name must be unique.");
@@ -57,6 +81,11 @@ public class CategoryService {
     }
 
     @Transactional
+    @Auditable(
+            action = DELETE,
+            targetType = "Category",
+            targetId = "#id"
+    )
     public void delete(Long id) {
         Category category = loadCategory(id);
         if (bookRepository.existsByCategory_Id(id)) {

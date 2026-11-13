@@ -14,8 +14,8 @@ public class AuditService {
     private final AuditEventMapper auditEventMapper;
 
 
-    public List<AuditEventDto> getEvents() {
-        return auditRepository.findAll().stream()
+    public List<AuditEventDto> getEvents(AuditFilterRequest filter) {
+        return auditRepository.findAll(AuditSpecification.fromFilter(filter)).stream()
                 .map(auditEventMapper::toDto)
                 .toList();
     }

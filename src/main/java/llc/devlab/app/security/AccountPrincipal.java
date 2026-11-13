@@ -3,6 +3,7 @@ package llc.devlab.app.security;
 import java.util.Collection;
 import java.util.List;
 import llc.devlab.app.model.entity.Account;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 public record AccountPrincipal(Account account) implements UserDetails {
 
     @Override
+    @NonNull
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + account.getRole().name()));
     }
@@ -20,6 +22,7 @@ public record AccountPrincipal(Account account) implements UserDetails {
     }
 
     @Override
+    @NonNull
     public String getUsername() {
         return account.getEmail();
     }
