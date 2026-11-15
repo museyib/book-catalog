@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import llc.devlab.app.Auditable;
+import llc.devlab.app.RiskLevel;
 import llc.devlab.app.config.AppProperties;
 import llc.devlab.app.exception.BadRequestException;
 import llc.devlab.app.exception.ConflictException;
@@ -36,7 +37,8 @@ public class BookService {
     @Auditable(
             action = READ,
             targetType = "Books",
-            targetId = ""
+            targetId = "",
+            riskLevel = RiskLevel.LOW
     )
     public PageResponse<BookSummaryResponse> list(int page, int size, String sort, BookFilterRequest request) {
         Pageable pageable = createPageable(page, size, sort);
@@ -62,7 +64,8 @@ public class BookService {
     @Auditable(
             action = READ,
             targetType = "Books",
-            targetId = ""
+            targetId = "",
+            riskLevel = RiskLevel.LOW
     )
     public CursorResponse<BookSummaryResponse> list(int size, String sort, BookCursorFilterRequest request) {
         List<Book> result = bookRepository.findBy(BookCursorSpecifications.fromFilter(request),
@@ -86,7 +89,8 @@ public class BookService {
     @Auditable(
             action = READ,
             targetType = "Book",
-            targetId = "#result.id()"
+            targetId = "#result.id()",
+            riskLevel = RiskLevel.LOW
     )
     public BookResponse get(Long id) {
         Book book = bookRepository.findDetailedById(id)
@@ -98,7 +102,8 @@ public class BookService {
     @Auditable(
             action = CREATE,
             targetType = "Book",
-            targetId = "#result.id()"
+            targetId = "#result.id()",
+            riskLevel = RiskLevel.LOW
     )
     public BookResponse create(BookCreateRequest request) {
         if (bookRepository.existsByIsbnIgnoreCase(request.isbn())) {
@@ -112,7 +117,8 @@ public class BookService {
     @Auditable(
             action = UPDATE,
             targetType = "Book",
-            targetId = "#result.id()"
+            targetId = "#result.id()",
+            riskLevel = RiskLevel.MEDIUM
     )
     public BookResponse update(Long id, BookUpdateRequest request) {
         if (bookRepository.existsByIsbnIgnoreCaseAndIdNot(request.isbn(), id)) {
@@ -127,7 +133,8 @@ public class BookService {
     @Auditable(
             action = DELETE,
             targetType = "BOOK",
-            targetId = "#id"
+            targetId = "#id",
+            riskLevel = RiskLevel.HIGH
     )
     public void delete(Long id) {
         bookRepository.delete(loadBook(id));

@@ -35,6 +35,7 @@ public class AuditAspect {
         AuditEventRequest request = new AuditEventRequest(
                 currentActorProvider.getCurrentActorId(),
                 auditable.action(),
+                auditable.riskLevel(),
                 auditable.targetType(),
                 targetId,
                 clientIpProvider.getClientIp());

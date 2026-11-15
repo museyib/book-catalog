@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.Instant;
+import java.util.List;
 
 @Component
 public class AuditEventMapper {
@@ -15,6 +16,7 @@ public class AuditEventMapper {
                 auditEvent.getOccurredAt(),
                 auditEvent.getActorId(),
                 auditEvent.getAction(),
+                auditEvent.getRiskLevel(),
                 auditEvent.getTargetType(),
                 auditEvent.getTargetId(),
                 auditEvent.getIpAddress());
@@ -25,6 +27,7 @@ public class AuditEventMapper {
         auditEvent.setOccurredAt(Instant.now());
         auditEvent.setActorId(request.actorId());
         auditEvent.setAction(request.action());
+        auditEvent.setRiskLevel(request.riskLevel());
         auditEvent.setTargetType(request.targetType());
         auditEvent.setTargetId(request.targetId());
         try {
@@ -33,5 +36,19 @@ public class AuditEventMapper {
             throw new RuntimeException(e);
         }
         return auditEvent;
+    }
+
+    public byte[] toCsv(List<AuditEvent> auditEvent) {
+        StringBuilder sb = new StringBuilder("Id,OccurredAt,ActorId,Action,RiskLevel,TargetType,TargetId,IpAddress\n");
+        auditEvent.forEach(audit -> sb.append(String.format("%s,%s,%s,%s,%s,%s,%s,%s\n",
+                audit.getId(),
+                audit.getOccurredAt(),
+                audit.getActorId(),
+                audit.getAction(),
+                audit.getRiskLevel(),
+                audit.getTargetType(),
+                audit.getTargetId(),
+                audit.getIpAddress())));
+        return sb.toString().getBytes();
     }
 }

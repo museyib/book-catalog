@@ -24,6 +24,9 @@ public class AuditEvent {
     @Enumerated(EnumType.STRING)
     private AuditAction action;
 
+    @Enumerated(EnumType.STRING)
+    private RiskLevel riskLevel;
+
     private String targetType;
 
     private String targetId;

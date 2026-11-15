@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.UUID;
 
 import llc.devlab.app.Auditable;
+import llc.devlab.app.RiskLevel;
 import llc.devlab.app.exception.BadRequestException;
 import llc.devlab.app.exception.ConflictException;
 import llc.devlab.app.model.dto.auth.AccountResponse;
@@ -41,7 +42,8 @@ public class AuthService {
     @Auditable(
             action = REGISTER,
             targetType = "Account",
-            targetId = ""
+            targetId = "",
+            riskLevel = RiskLevel.LOW
     )
     public TokenResponse register(RegisterRequest request) {
         String normalizedEmail = normalizeEmail(request.email());
@@ -61,7 +63,8 @@ public class AuthService {
     @Auditable(
             action = LOGIN,
             targetType = "Account",
-            targetId = ""
+            targetId = "",
+            riskLevel = RiskLevel.LOW
     )
     public TokenResponse login(LoginRequest request) {
         String normalizedEmail = normalizeEmail(request.email());
@@ -98,7 +101,8 @@ public class AuthService {
     @Auditable(
             action = LOGOUT,
             targetType = "Account",
-            targetId = ""
+            targetId = "",
+            riskLevel = RiskLevel.LOW
     )
     public void logout(RefreshTokenRequest request) {
         JwtService.ParsedRefreshToken parsed = parseRefreshToken(request.refreshToken());

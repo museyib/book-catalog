@@ -3,6 +3,7 @@ package llc.devlab.app.service;
 import java.util.List;
 
 import llc.devlab.app.Auditable;
+import llc.devlab.app.RiskLevel;
 import llc.devlab.app.exception.ConflictException;
 import llc.devlab.app.exception.ResourceNotFoundException;
 import llc.devlab.app.mapper.CategoryMapper;
@@ -29,7 +30,8 @@ public class CategoryService {
     @Auditable(
             action = READ,
             targetType = "Categories",
-            targetId = ""
+            targetId = "",
+            riskLevel = RiskLevel.LOW
     )
     public List<CategoryResponse> list() {
         return categoryRepository.findAllByOrderByNameAsc()
@@ -42,7 +44,8 @@ public class CategoryService {
     @Auditable(
             action = READ,
             targetType = "Category",
-            targetId = "id"
+            targetId = "id",
+            riskLevel = RiskLevel.LOW
     )
     public CategoryResponse get(Long id) {
         return categoryMapper.toResponse(loadCategory(id));
@@ -52,7 +55,8 @@ public class CategoryService {
     @Auditable(
             action = CREATE,
             targetType = "Category",
-            targetId = "#result.id"
+            targetId = "#result.id",
+            riskLevel = RiskLevel.LOW
     )
     public CategoryResponse create(CategoryRequest request) {
         if (categoryRepository.existsByNameIgnoreCase(request.name().trim())) {
@@ -68,7 +72,8 @@ public class CategoryService {
     @Auditable(
             action = UPDATE,
             targetType = "Category",
-            targetId = "#result.id"
+            targetId = "#result.id",
+            riskLevel = RiskLevel.LOW
     )
     public CategoryResponse update(Long id, CategoryRequest request) {
         if (categoryRepository.existsByNameIgnoreCaseAndIdNot(request.name().trim(), id)) {
@@ -84,7 +89,8 @@ public class CategoryService {
     @Auditable(
             action = DELETE,
             targetType = "Category",
-            targetId = "#id"
+            targetId = "#id",
+            riskLevel = RiskLevel.LOW
     )
     public void delete(Long id) {
         Category category = loadCategory(id);

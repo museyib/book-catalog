@@ -11,4 +11,5 @@ public @interface Auditable {
     AuditAction action();
     String targetType();
     String targetId();
+    RiskLevel riskLevel();
 }

@@ -20,6 +20,10 @@ public class AuditService {
                 .toList();
     }
 
+    public byte[] exportToCsv(AuditFilterRequest filter) {
+        return auditEventMapper.toCsv(auditRepository.findAll(AuditSpecification.fromFilter(filter)));
+    }
+
     @Transactional
     public void logEvent(AuditEventRequest request) {
         AuditEvent auditEvent = auditEventMapper.toEntity(request);

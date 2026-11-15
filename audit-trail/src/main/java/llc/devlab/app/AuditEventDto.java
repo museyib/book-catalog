@@ -7,6 +7,7 @@ public record AuditEventDto(Long id,
                             Instant occurredAt,
                             String actorId,
                             AuditAction action,
+                            RiskLevel riskLevel,
                             String targetType,
                             String targetId,
                             InetAddress ipAddress) {

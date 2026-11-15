@@ -19,7 +19,11 @@ public class AuditController {
 
     @GetMapping
     public List<AuditEventDto> getEvents(@Valid @ModelAttribute AuditFilterRequest filter) {
-        log.info("Received audit filter request: {}", filter);
         return auditService.getEvents(filter);
+    }
+
+    @GetMapping("/export")
+    public byte[] exportToCsv(@Valid @ModelAttribute AuditFilterRequest filter) {
+        return auditService.exportToCsv(filter);
     }
 }
